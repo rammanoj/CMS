@@ -10,7 +10,7 @@ class Brand(models.Model):
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
-    parent = models.ForeignKey('self', on_delete=models.CASCADE)
+    parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -21,7 +21,7 @@ class Relation(models.Model):
     child = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='category_child')
 
     def __str__(self):
-        return self.category.__str__() + "--" + self.category.__str__()
+        return self.category.__str__() + "--" + self.child.__str__()
 
 
 class Product(models.Model):
