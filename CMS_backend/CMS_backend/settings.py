@@ -122,6 +122,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static_cdn')
+
+MEDIA_URL = '/uploads/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads')
 
 
 REST_FRAMEWORK = {
@@ -132,7 +136,7 @@ REST_FRAMEWORK = {
     ),
     'EXCEPTION_HANDLER': 'CMS_backend.utils.custom_exception_handler',
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 50
+    'PAGE_SIZE': 10
 }
 
 CORS_ORIGIN_ALLOW_ALL = True

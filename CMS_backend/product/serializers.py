@@ -1,4 +1,4 @@
-from rest_framework.serializers import ModelSerializer, SerializerMethodField, PrimaryKeyRelatedField
+from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from .models import Brand, Product, Specification, Category
 
 
@@ -26,7 +26,7 @@ class ProductListCreateSerializer(ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['pk', 'name', 'brand', 'category']
+        fields = ['pk', 'name', 'brand', 'category', 'image']
 
 
 class ProductSerializer(ModelSerializer):
@@ -47,7 +47,7 @@ class ProductSerializer(ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['pk', 'name', 'brand', 'category', 'spec']
+        fields = ['pk', 'name', 'brand', 'category', 'spec', 'image']
 
 
 class CategorySerializer(ModelSerializer):

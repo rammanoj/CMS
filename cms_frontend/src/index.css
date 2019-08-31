@@ -3,7 +3,8 @@ body {
 }
 
 .ui.secondary.nav.menu {
-  background: #f8f9fa !important;
+  background: #36c !important;
+  color: white !important;
   box-shadow: 2px 2px 2px rgb(136, 136, 136, 0.4);
 }
 
@@ -12,6 +13,7 @@ body {
   margin-top: -2vh !important;
   margin-left: -1vw !important;
   margin-bottom: -10px !important;
+  color: white !important;
 }
 
 .item.header:hover {
@@ -44,6 +46,18 @@ body {
   cursor: pointer !important;
   height: auto !important;
   width: 100% !important;
+  animation: slide-up 0.4s ease;
+}
+
+@keyframes slide-up {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .ui.card.product:hover {
@@ -60,15 +74,94 @@ body {
   font-weight: bold;
 }
 
-.gallary {
-  margin-top: 5vh !important;
-  display: inline-block !important;
-  column-count: 4 !important;
-  line-height: 0px !important;
-  column-gap: 0px !important;
+@media only screen and (min-width: 1200px) {
+  .gallary {
+    margin-top: 5vh !important;
+    display: inline-block !important;
+    column-count: 4 !important;
+    line-height: 0px !important;
+    column-gap: 0px !important;
+  }
+}
+
+@media only screen and (max-width: 1200px) {
+  .gallary {
+    margin-top: 5vh !important;
+    display: inline-block !important;
+    column-count: 4 !important;
+    line-height: 0px !important;
+    column-gap: 0px !important;
+  }
+}
+
+@media only screen and (max-width: 900px) {
+  .gallary {
+    margin-top: 5vh !important;
+    display: inline-block !important;
+    column-count: 3 !important;
+    line-height: 0px !important;
+    column-gap: 0px !important;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .gallary {
+    margin-top: 5vh !important;
+    display: inline-block !important;
+    column-count: 2 !important;
+    line-height: 0px !important;
+    column-gap: 0px !important;
+  }
+}
+
+@media only screen and (max-width: 400px) {
+  .gallary {
+    margin-top: 5vh !important;
+    display: inline-block !important;
+    column-count: 1 !important;
+    line-height: 0px !important;
+    column-gap: 0px !important;
+  }
 }
 
 .ui.card.filters {
   width: 100% !important;
   box-shadow: none !important;
+}
+
+.file_upload {
+  background: #eaecf0;
+  padding: 10px;
+  border-radius: 5px;
+  color: black;
+  cursor: pointer;
+}
+
+.ui.button.add_key_value {
+  float: right !important;
+  background: #eaecf0 !important;
+  color: black !important;
+  margin-right: 10px !important;
+  margin-top: 5px !important;
+}
+
+.ui.button.add_key_value:hover {
+  box-shadow: 2px 2px 10px 2px rgb(136, 136, 136, 0.4);
+}
+
+.ui.button.submit {
+  color: white;
+  background: #36c;
+}
+
+#messages {
+  right: 10px !important;
+  top: 30px !important;
+  width: calc(100px + 20vw) !important;
+  position: fixed !important;
+  z-index: 1002 !important;
+}
+
+.ui.tiny.modal.transition.visible.active.add_modal {
+  animation: slide-up 0.4s ease !important;
 }

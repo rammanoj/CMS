@@ -9,6 +9,7 @@ from .models import Brand, Product, Specification, Category, Relation
 
 
 class BrandListCreateAPIView(ListCreateAPIView):
+    
     serializer_class = BrandSerializer
     queryset = Brand.objects.all()
 
@@ -38,10 +39,15 @@ class ProductListCreateView(ListCreateAPIView):
             del request.session['category']
 
         brand = request.GET.get('brand', None)
-        category = request.GET.get('category', None)
+        category, categories, tree = request.GET.get('category', None), [], []
         if category is not None:
             categories = list(Relation.objects.filter(category__name=category).values_list('child__pk', flat=True))
             categories.append(get_object_or_404(Category, name=category).pk)
+            tree = []
+            parent_exist = get_object_or_404(Category, name=category)
+            while parent_exist:
+                tree.append(parent_exist.name)
+                parent_exist = parent_exist.parent
 
         queryset = self.queryset
         if brand is not None:
@@ -57,25 +63,51 @@ class ProductListCreateView(ListCreateAPIView):
 
         self.queryset = queryset
 
-        return super(ProductListCreateView, self).get(request, *args, **kwargs)
+        context = super(ProductListCreateView, self).get(request, *args, **kwargs)
+        if len(tree) != 0:
+            context.data['categories'] = tree
+        return context
 
     def post(self, request, *args, **kwargs):
-        with transaction.atomic():
-            # Create the product
-            context = super(ProductListCreateView, self).post(request, *args, **kwargs)
-            product = get_object_or_404(Product, pk=context.data['pk'])
-            out, spec = [], request.data['spec']
-            for i in spec:
-                if "key" not in i or "value" not in i:
-                    continue
+        if "brand" not in request.data or \
+                "category" not in request.data or \
+                dict(request.data)['brand'] in ['', ['']] or dict(request.data)['category'] in ['', ['']]:
+            return Response({'message': 'Fill form completely', 'error': 1}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            with transaction.atomic():
+                # Create the product
+                request.data._mutable = True
+                request.data['brand'] = get_object_or_404(Brand, name=request.data['brand']).pk
+                request.data['category'] = get_object_or_404(Category, name=request.data['category']).pk
+                request.data._mutable = False
 
-                if not (i['key'] and i['value']):
-                    continue
+                context = super(ProductListCreateView, self).post(request, *args, **kwargs)
+                product = get_object_or_404(Product, pk=context.data['pk'])
+                data = dict(request.data)
+                if "spec[][key]" in data and "spec[][value]" in data:
+                    out, key, value = [], data['spec[][key]'], data['spec[][value]']
+                    if len(key) != len(value):
+                        raise InterruptedError
+                    for i in range(0, len(key)):
 
-                i['product'] = product
-                data = Specification.objects.create(**i)
-                out.append({"key": data.key, "value": data.value})
-            context.data['spec'] = out
+                        if not (key[i] and value[i]):
+                            continue
+
+                        obj = {
+                            "key": key[i],
+                            "value": value[i],
+                            "product": product
+                        }
+                        data = Specification.objects.create(**obj)
+                        out.append({"key": data.key, "value": data.value})
+                    context.data['spec'] = out
+                else:
+                    context.data['spec'] = []
+        except InterruptedError:
+            return Response({
+                'message': 'Enter all key and value pairs',
+                'error': 1
+            }, status=status.HTTP_400_BAD_REQUEST)
         return context
 
 
@@ -87,22 +119,37 @@ class ProductRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
         return get_object_or_404(Product, pk=self.kwargs['pk'])
 
     def patch(self, request, *args, **kwargs):
-        with transaction.atomic():
-            context = super(ProductRetrieveUpdateDestroyAPIView, self).patch(request, *args, **kwargs)
-            if "spec" in request.data:
-                spec, out = request.data['spec'], []
-                self.get_object().specification_set.all().delete()
-                for i in spec:
-                    if "key" not in i or "value" not in i:
-                        continue
+        try:
+            with transaction.atomic():
+                request.data._mutable = True
+                request.data['brand'] = get_object_or_404(Brand, name=request.data['brand']).pk
+                request.data['category'] = get_object_or_404(Category, name=request.data['category']).pk
+                request.data._mutable = False
 
-                    if not (i['key'] and i['value']):
-                        continue
+                context = super(ProductRetrieveUpdateDestroyAPIView, self).patch(request, *args, **kwargs)
+                data = dict(request.data)
+                if "spec[][key]" in data and "spec[][value]" in data:
+                    self.get_object().specification_set.all().delete()
+                    out, key, value = [], data['spec[][key]'], data['spec[][value]']
+                    if len(key) != len(value):
+                        raise InterruptedError
+                    for i in range(0, len(key)):
 
-                    i['product'] = self.get_object()
-                    data = Specification.objects.create(**i)
-                    out.append({"key": data.key, "value": data.value})
-                context.data['spec'] = out
+                        if not (key[i] and value[i]):
+                            continue
+
+                        obj = {
+                            "key": key[i],
+                            "value": value[i],
+                            "product": self.get_object()
+                        }
+                        data = Specification.objects.create(**obj)
+                        out.append({"key": data.key, "value": data.value})
+        except InterruptedError:
+            return Response({
+                'message': 'Enter key and value pair details properly',
+                'error': 1
+            }, status=status.HTTP_400_BAD_REQUEST)
         return context
 
     def delete(self, request, *args, **kwargs):
@@ -137,9 +184,11 @@ class CategoryListCreateAPIView(ListCreateAPIView):
     def post(self, request, *args, **kwargs):
         with transaction.atomic():
             # Create the Category
+            request.data['parent'] = get_object_or_404(Category, name=request.data['parent']).pk
             context = super(CategoryListCreateAPIView, self).post(request, *args, **kwargs)
-
-            parent_exist = get_object_or_404(Category, pk=request.data['parent'])
+            parent_exist = Category.objects.filter(name=context.data['parent'])
+            if parent_exist.exists():
+                parent_exist = parent_exist[0]
             child = get_object_or_404(Category, pk=context.data['pk'])
             while parent_exist:
                 Relation.objects.create(category=parent_exist, child=child)
@@ -152,11 +201,12 @@ class CategoryRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     http_method_names = ['patch', 'delete']
 
     def get_object(self):
-        return get_object_or_404(Category, pk=self.kwargs['pk'])
+        return get_object_or_404(Category, name=self.kwargs['name'])
 
     def patch(self, request, *args, **kwargs):
         parent = self.get_object().parent.name
         with transaction.atomic():
+            request.data['parent'] = get_object_or_404(Category, name=request.data['parent']).pk
             context = super(CategoryRetrieveUpdateDestroyAPIView, self).patch(request, *args, **kwargs)
             if parent != context.data['parent']:
                 # Update 'Relation' table

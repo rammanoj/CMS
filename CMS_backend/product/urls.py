@@ -16,6 +16,6 @@ urlpatterns = [
 
     # Category Urls
     path('category/add/', CategoryListCreateAPIView.as_view(), name='category-create'),
-    path('category/<int:pk>/', CategoryRetrieveUpdateDestroyAPIView.as_view(), name='category-update'),
+    path('category/<name>/', CategoryRetrieveUpdateDestroyAPIView.as_view(), name='category-update'),
 
 ]
