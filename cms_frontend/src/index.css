@@ -2,18 +2,74 @@ body {
   background: #ffffff;
 }
 
-.ui.secondary.nav.menu {
+.load_text {
+  text-align: center;
+  margin-top: 20vh;
+  color: white;
+}
+
+.load_text h1 {
+  font-size: 40px;
+}
+
+.nav {
   background: #36c !important;
   color: white !important;
   box-shadow: 2px 2px 2px rgb(136, 136, 136, 0.4);
+  width: 100%;
+  height: 65px;
+  z-index: 1 !important;
 }
 
-.item.header {
-  font-size: 30px !important;
-  margin-top: -2vh !important;
-  margin-left: -1vw !important;
-  margin-bottom: -10px !important;
+.header {
+  font-size: 30px;
+  margin-left: 5px;
+  margin-top: 5px !important;
+}
+
+.ui.icon.input.search {
+  width: 70% !important;
+  margin-top: 7px !important;
+  border: none !important;
+}
+
+.ui.icon.input.search input {
+  border: none !important;
+  border-radius: 5px !important;
+  background: rgb(0, 0, 0, 0.1);
+  color: white;
+  font-weight: bold;
+}
+
+.ui.icon.input.search input::placeholder {
+  color: white;
+  font-weight: bold;
+}
+
+.ui.icon.input.search input::selection {
+  color: white;
+  font-weight: bold;
+}
+
+.ui.button.update_parent {
+  background: inherit !important;
   color: white !important;
+  margin-top: 5px !important;
+}
+
+.search.icon {
+  color: white !important;
+}
+
+.filters_nav {
+  background: #f8f9fa;
+  width: 100vw;
+  padding: 5px !important;
+}
+
+.filters_nav .ui.button {
+  background: inherit !important;
+  color: #36c !important;
 }
 
 .item.header:hover {
@@ -42,7 +98,6 @@ body {
 }
 
 .ui.card.product {
-  box-shadow: none !important;
   cursor: pointer !important;
   height: auto !important;
   width: 100% !important;
@@ -61,7 +116,7 @@ body {
 }
 
 .ui.card.product:hover {
-  box-shadow: -2px 2px 10px 1px #888888 !important;
+  box-shadow: -2px 2px 10px 1px rgb(51, 102, 204, 0.4) !important;
   z-index: 1 !important;
 }
 
@@ -72,56 +127,6 @@ body {
 .ui.card.product:hover .extra.content {
   color: #000 !important;
   font-weight: bold;
-}
-
-@media only screen and (min-width: 1200px) {
-  .gallary {
-    margin-top: 5vh !important;
-    display: inline-block !important;
-    column-count: 4 !important;
-    line-height: 0px !important;
-    column-gap: 0px !important;
-  }
-}
-
-@media only screen and (max-width: 1200px) {
-  .gallary {
-    margin-top: 5vh !important;
-    display: inline-block !important;
-    column-count: 4 !important;
-    line-height: 0px !important;
-    column-gap: 0px !important;
-  }
-}
-
-@media only screen and (max-width: 900px) {
-  .gallary {
-    margin-top: 5vh !important;
-    display: inline-block !important;
-    column-count: 3 !important;
-    line-height: 0px !important;
-    column-gap: 0px !important;
-  }
-}
-
-@media only screen and (max-width: 600px) {
-  .gallary {
-    margin-top: 5vh !important;
-    display: inline-block !important;
-    column-count: 2 !important;
-    line-height: 0px !important;
-    column-gap: 0px !important;
-  }
-}
-
-@media only screen and (max-width: 400px) {
-  .gallary {
-    margin-top: 5vh !important;
-    display: inline-block !important;
-    column-count: 1 !important;
-    line-height: 0px !important;
-    column-gap: 0px !important;
-  }
 }
 
 .ui.card.filters {

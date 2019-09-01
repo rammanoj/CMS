@@ -1,6 +1,16 @@
 import React from "react";
 import { productDetail } from "./api";
-import { Modal, Grid, Image, Icon, Placeholder } from "semantic-ui-react";
+import {
+  Modal,
+  Grid,
+  Image,
+  Icon,
+  Placeholder,
+  Card,
+  Label,
+  Message
+} from "semantic-ui-react";
+import productImage from "./img/product.png";
 
 class ProductDetailView extends React.Component {
   /**
@@ -47,7 +57,7 @@ class ProductDetailView extends React.Component {
           closeIcon={true}
           onClose={() => {
             this.setState({ open: false });
-            this.props.set({ product: false });
+            this.props.set({ product: false }, () => {});
           }}
           centered
           size="small"
@@ -77,24 +87,48 @@ class ProductDetailView extends React.Component {
                   </React.Fragment>
                 ) : (
                   <React.Fragment>
-                    <Grid.Column width={8}>
-                      <Image src={p.image} />
+                    <Grid.Column
+                      width={8}
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center"
+                      }}
+                    >
+                      <Card style={{ height: "auto", width: "auto" }}>
+                        <Image
+                          src={p.image === null ? productImage : p.image}
+                          style={{ margin: 10 }}
+                        />
+                      </Card>
                     </Grid.Column>
                     <Grid.Column width={8}>
                       <h2>{p.name}</h2>
-                      <p>
-                        <Icon name="tag" /> {p.brand}
-                      </p>
-                      <p>
-                        <b>Category:</b> {p.category}
-                      </p>
-                      <h4>Specs</h4>
-                      {p.spec.map((obj, index) => (
-                        <p key={index}>
-                          <Icon name="clipboard list" />
-                          <b>{obj.key}: </b> {obj.value}
+                      <Message info>
+                        <p>
+                          <Icon name="tag" color="teal" /> {p.brand}
                         </p>
-                      ))}
+                        <p>
+                          <b>Category:</b> {p.category}
+                        </p>
+                        <h4>Specs</h4>
+                        {p.spec.map((obj, index) => (
+                          <Label
+                            as="a"
+                            color="teal"
+                            key={index}
+                            icon
+                            style={{ marginTop: 2 }}
+                          >
+                            <Icon
+                              name="clipboard list"
+                              style={{ marginRight: 5 }}
+                            />
+                            <b>{obj.key}</b>
+                            <Label.Detail>{obj.value}</Label.Detail>
+                          </Label>
+                        ))}
+                      </Message>
                     </Grid.Column>
                   </React.Fragment>
                 )}

@@ -3,13 +3,14 @@ import {
   Card,
   Placeholder,
   Grid,
-  Image,
   Icon,
-  Form,
+  Popup,
   Button,
   Dropdown,
   Pagination,
-  Breadcrumb
+  Breadcrumb,
+  Message,
+  Label
 } from "semantic-ui-react";
 import Nav from "./nav";
 import { productList, BrandList, CategoryList } from "./api";
@@ -18,6 +19,8 @@ import "react-tiny-fab/dist/styles.css";
 import ProductDetailView from "./detail";
 import AddItems from "./add";
 import MessageDisplay from "./message";
+import productImage from "./img/product.png";
+import LoadingText from "./text";
 
 class Product extends React.Component {
   /**
@@ -39,21 +42,24 @@ class Product extends React.Component {
       categories: [],
       tree: [],
       add: false,
+      child: [],
       message: {
         update: false,
         type: 1,
         message: "",
         trigger: false
-      }
+      },
+      textanimate: localStorage.getItem("animate") === null
     };
   }
 
-  set = obj => {
+  set = (obj, callback) => {
     /**
      * Update the state from child components
      * @param {object} obj Parameters of the current state (to be updated).
+     * @param {object} callback callback function that is to be called after state update.
      */
-    this.setState(obj);
+    this.setState(obj, callback);
   };
 
   componentDidMount = () => {
@@ -85,6 +91,12 @@ class Product extends React.Component {
           loading: this.state.filters_load == 2 ? false : true
         });
       });
+
+    // settimeOut for the text animation
+    if (this.state.textanimate) {
+      localStorage.setItem("animate", true);
+      setTimeout(() => this.setState({ textanimate: false }), 6000);
+    }
   };
 
   getProducts = uri => {
@@ -129,7 +141,10 @@ class Product extends React.Component {
         products: response.results,
         pages: Math.ceil(response.count / 10),
         tree:
-          response.categories !== undefined ? response.categories.reverse() : []
+          response.categories !== undefined
+            ? response.categories.reverse()
+            : [],
+        child: response.child
       });
     } else {
       this.setState({
@@ -169,105 +184,32 @@ class Product extends React.Component {
   };
 
   render = () => {
+    document.body.style.background = "#ffffff";
     return (
       <React.Fragment>
-        <Nav
-          message={this.state.message}
-          category={this.state.categories}
-          set={this.set}
-          brand={this.state.brands}
-        />
-        <MessageDisplay
-          update={this.state.message.update}
-          trigger={this.state.message.trigger}
-          message={this.state.message.message}
-          type={this.state.message.type}
-        />
-        <Fab
-          icon={<Icon name="plus" style={{ marginLeft: 4 }} />}
-          mainButtonStyles={{ background: "#36c" }}
-          alwaysShowTitle={false}
-        >
-          <Action
-            text="Product"
-            style={{ background: "#36c" }}
-            onClick={() => this.setState({ add: 0 })}
-          >
-            <Icon name="box" />
-          </Action>
-          <Action
-            style={{ background: "#36c" }}
-            text="Brand"
-            onClick={() => this.setState({ add: 1 })}
-          >
-            <Icon name="tag" />
-          </Action>
-          <Action
-            style={{ background: "#36c" }}
-            text="Category"
-            onClick={() => this.setState({ add: 2 })}
-          >
-            <Icon name="bars" />
-          </Action>
-        </Fab>
-        {this.state.product !== false ? (
-          <ProductDetailView product={this.state.product} set={this.set} />
+        {this.state.textanimate ? (
+          <LoadingText />
         ) : (
-          ""
-        )}
-        {this.state.add !== false ? (
-          <AddItems
-            add={this.state.add}
-            brand={this.state.brands}
-            category={this.state.categories}
-            product={this.state.products}
-            set={this.set}
-            message={this.state.message}
-          />
-        ) : (
-          ""
-        )}
-        <Grid>
-          <Grid.Row>
-            <Grid.Column width={1}></Grid.Column>
-            <Grid.Column width={14}>
-              <div style={{ textAlign: "center" }}>
-                <div
-                  style={{
-                    marginTop: "5vh",
-                    width: "100%",
-                    display: "inline-block"
-                  }}
-                >
-                  <Form
-                    onSubmit={() => {
-                      this.setState(
-                        { loading: true, products: [], page: 1 },
-                        () => this.getProducts(this.getUri())
-                      );
-                    }}
-                  >
-                    <Form.Input
-                      icon="search"
-                      style={{ width: "60%" }}
-                      placeholder="Search Products..."
-                      value={this.state.search}
-                      loading={this.state.loading && this.state.search !== ""}
-                      onChange={e => {
-                        this.setState({ search: e.target.value });
-                      }}
-                    />
-                  </Form>
-                </div>
-              </div>
-              <Card className="filters">
+          <React.Fragment>
+            <div>
+              <Nav
+                message={this.state.message}
+                category={this.state.categories}
+                set={this.set}
+                brand={this.state.brands}
+                getProducts={this.getProducts}
+                getUri={this.getUri}
+                loading={this.state.loading}
+                search={this.state.search}
+              />
+              <div className="filters_nav">
                 <Grid>
                   <Grid.Row>
-                    <Grid.Column width={2}></Grid.Column>
-                    <Grid.Column width={6}>
+                    <Grid.Column computer={7} tablet={8} mobile={16}>
                       <Dropdown
                         selectOnBlur={false}
                         placeholder="Filter by Brand"
+                        style={{ marginLeft: "4vw", width: "85%" }}
                         onChange={(e, obj) =>
                           this.setState({ brand: obj.value })
                         }
@@ -279,10 +221,9 @@ class Product extends React.Component {
                         search
                         selection
                         options={this.state.brands}
-                        icon=""
                       />
                     </Grid.Column>
-                    <Grid.Column width={6}>
+                    <Grid.Column computer={7} tablet={8} mobile={16}>
                       <Dropdown
                         selectOnBlur={false}
                         onChange={(e, obj) =>
@@ -290,6 +231,7 @@ class Product extends React.Component {
                         }
                         placeholder="Filter by category"
                         fluid
+                        style={{ marginLeft: "4vw", width: "85%" }}
                         allowAdditions={true}
                         value={
                           this.state.category !== false
@@ -299,165 +241,288 @@ class Product extends React.Component {
                         search
                         selection
                         options={this.state.categories}
-                        icon=""
                       />
                     </Grid.Column>
-                    <Grid.Column width={2}></Grid.Column>
+                    <Grid.Column
+                      computer={1}
+                      tablet={8}
+                      mobile={8}
+                      style={{ textAlign: "left" }}
+                    >
+                      <Button onClick={() => this.getProducts(this.getUri())}>
+                        Apply
+                      </Button>
+                    </Grid.Column>
+                    <Grid.Column
+                      computer={1}
+                      tablet={8}
+                      mobile={8}
+                      style={{ textAlign: "right" }}
+                    >
+                      <Popup
+                        trigger={
+                          <Button
+                            onClick={() => {
+                              this.setState(
+                                {
+                                  brand: false,
+                                  category: false,
+                                  loading: true
+                                },
+                                () => this.getProducts(this.getUri())
+                              );
+                            }}
+                          >
+                            <Icon name="trash alternate outline" color="red" />
+                          </Button>
+                        }
+                        content={"Clear Filters"}
+                        position="bottom center"
+                      />
+                    </Grid.Column>
+                    <Grid.Column width={1}></Grid.Column>
                   </Grid.Row>
                 </Grid>
-              </Card>
-              <Button onClick={() => this.getProducts(this.getUri())}>
-                Apply
-              </Button>
-
-              {this.state.loading ? (
-                <React.Fragment>
-                  <div style={{ marginTop: "4vh" }}>
-                    <Grid>
-                      <Grid.Row>
-                        <Grid.Column width={4}>
-                          <Card>
-                            <Card.Content>
-                              <Placeholder>
-                                <Placeholder.Image square />
-                              </Placeholder>
-                            </Card.Content>
-                          </Card>
-                        </Grid.Column>
-                        <Grid.Column width={4}>
-                          <Card>
-                            <Card.Content>
-                              <Placeholder>
-                                <Placeholder.Image square />
-                              </Placeholder>
-                            </Card.Content>
-                          </Card>
-                        </Grid.Column>
-                        <Grid.Column width={4}>
-                          <Card>
-                            <Card.Content>
-                              <Placeholder>
-                                <Placeholder.Image square />
-                              </Placeholder>
-                            </Card.Content>
-                          </Card>
-                        </Grid.Column>
-                        <Grid.Column width={4}>
-                          <Card>
-                            <Card.Content>
-                              <Placeholder>
-                                <Placeholder.Image square />
-                              </Placeholder>
-                            </Card.Content>
-                          </Card>
-                        </Grid.Column>
-                      </Grid.Row>
-                    </Grid>
-                  </div>
-                </React.Fragment>
-              ) : (
-                <React.Fragment>
-                  {this.state.tree.length !== 0 ? (
-                    <Breadcrumb>
-                      {this.state.tree.map((obj, index) => (
+              </div>
+            </div>
+            <MessageDisplay
+              update={this.state.message.update}
+              trigger={this.state.message.trigger}
+              message={this.state.message.message}
+              type={this.state.message.type}
+            />
+            <Fab
+              icon={<Icon name="plus" style={{ marginLeft: 4 }} />}
+              mainButtonStyles={{ background: "#36c" }}
+              alwaysShowTitle={false}
+            >
+              <Action
+                text="Product"
+                style={{ background: "#36c" }}
+                onClick={() => this.setState({ add: 0 })}
+              >
+                <Icon name="box" />
+              </Action>
+              <Action
+                style={{ background: "#36c" }}
+                text="Brand"
+                onClick={() => this.setState({ add: 1 })}
+              >
+                <Icon name="tag" />
+              </Action>
+              <Action
+                style={{ background: "#36c" }}
+                text="Category"
+                onClick={() => this.setState({ add: 2 })}
+              >
+                <Icon name="bars" />
+              </Action>
+            </Fab>
+            {this.state.product !== false ? (
+              <ProductDetailView product={this.state.product} set={this.set} />
+            ) : (
+              ""
+            )}
+            {this.state.add !== false ? (
+              <AddItems
+                add={this.state.add}
+                brand={this.state.brands}
+                category={this.state.categories}
+                product={this.state.products}
+                set={this.set}
+                message={this.state.message}
+              />
+            ) : (
+              ""
+            )}
+            <div style={{ marginTop: "6vh" }}></div>
+            <Grid>
+              <Grid.Row>
+                <Grid.Column width={1}></Grid.Column>
+                <Grid.Column width={14}>
+                  {this.state.loading ? (
+                    <React.Fragment>
+                      <div>
+                        <Grid>
+                          <Grid.Row>
+                            <Grid.Column width={4}>
+                              <Card>
+                                <Card.Content>
+                                  <Placeholder>
+                                    <Placeholder.Image square />
+                                  </Placeholder>
+                                </Card.Content>
+                              </Card>
+                            </Grid.Column>
+                            <Grid.Column width={4}>
+                              <Card>
+                                <Card.Content>
+                                  <Placeholder>
+                                    <Placeholder.Image square />
+                                  </Placeholder>
+                                </Card.Content>
+                              </Card>
+                            </Grid.Column>
+                            <Grid.Column width={4}>
+                              <Card>
+                                <Card.Content>
+                                  <Placeholder>
+                                    <Placeholder.Image square />
+                                  </Placeholder>
+                                </Card.Content>
+                              </Card>
+                            </Grid.Column>
+                            <Grid.Column width={4}>
+                              <Card>
+                                <Card.Content>
+                                  <Placeholder>
+                                    <Placeholder.Image square />
+                                  </Placeholder>
+                                </Card.Content>
+                              </Card>
+                            </Grid.Column>
+                          </Grid.Row>
+                        </Grid>
+                      </div>
+                    </React.Fragment>
+                  ) : (
+                    <React.Fragment>
+                      {this.state.tree.length !== 0 ? (
                         <React.Fragment>
-                          <Breadcrumb.Section
-                            key={index}
-                            link
-                            onClick={() =>
-                              this.setState({ category: obj }, () =>
-                                this.getProducts(this.getUri())
-                              )
-                            }
-                          >
-                            {obj}
-                          </Breadcrumb.Section>
-                          <Breadcrumb.Divider icon="right angle" />
+                          <Breadcrumb style={{ marginBottom: "2vh" }}>
+                            {this.state.tree.map((obj, index) => (
+                              <React.Fragment>
+                                <Breadcrumb.Section
+                                  key={index}
+                                  link
+                                  onClick={() =>
+                                    this.setState({ category: obj }, () =>
+                                      this.getProducts(this.getUri())
+                                    )
+                                  }
+                                >
+                                  {obj}
+                                </Breadcrumb.Section>
+                                <Breadcrumb.Divider icon="right angle" />
+                              </React.Fragment>
+                            ))}
+                          </Breadcrumb>
+
+                          {this.state.child.length > 0 ? (
+                            <Message info>
+                              <Message.Header>Sub Categories</Message.Header>
+                              <br />
+                              {this.state.child.map((obj, index) => (
+                                <Label
+                                  color="teal"
+                                  as="a"
+                                  style={{ marginTop: 1 }}
+                                  key={index}
+                                  onClick={() => {
+                                    this.setState({ category: obj }, () =>
+                                      this.getProducts(this.getUri())
+                                    );
+                                  }}
+                                >
+                                  <b>{obj}</b>
+                                </Label>
+                              ))}
+                            </Message>
+                          ) : (
+                            ""
+                          )}
                         </React.Fragment>
-                      ))}
-                    </Breadcrumb>
+                      ) : (
+                        ""
+                      )}
+                      {this.state.products.length !== 0 ? (
+                        <Grid>
+                          {this.state.products.map((obj, index) => (
+                            <Grid.Column computer={4} tablet={5} mobile={16}>
+                              <Card
+                                key={index}
+                                className="product"
+                                onClick={() => this.setState({ product: obj })}
+                              >
+                                <img
+                                  src={
+                                    obj.image !== null
+                                      ? obj.image
+                                      : productImage
+                                  }
+                                  style={{ height: "200px", width: "auto" }}
+                                />
+                                <Card.Content>
+                                  <Card.Header>{obj.name}</Card.Header>
+                                  <Card.Meta style={{ marginTop: 10 }}>
+                                    <Icon name="tag" />
+                                    {obj.brand}
+                                  </Card.Meta>
+                                </Card.Content>
+                                <Card.Content extra>
+                                  <span
+                                    style={{ paddingTop: 5, paddingBottom: 5 }}
+                                  >
+                                    Category: {obj.category}
+                                  </span>
+                                </Card.Content>
+                              </Card>
+                            </Grid.Column>
+                          ))}
+                        </Grid>
+                      ) : (
+                        <div style={{ textAlign: "center", marginTop: "5vh" }}>
+                          <Icon name="frown outline" size="massive" />
+                          <h2>No products found!!!</h2>
+                        </div>
+                      )}
+                    </React.Fragment>
+                  )}
+
+                  {[0, 1].indexOf(this.state.pages) === -1 &&
+                  !this.state.loading ? (
+                    <div style={{ textAlign: "center" }}>
+                      <Pagination
+                        style={{ marginTop: "4vh" }}
+                        defaultActivePage={this.state.page}
+                        onPageChange={(e, data) => {
+                          this.setState({ page: data.activePage });
+                          this.getProducts(
+                            this.getUri() + "?page=" + data.activePage
+                          );
+                        }}
+                        ellipsisItem={{
+                          content: <Icon name="ellipsis horizontal" />,
+                          icon: true
+                        }}
+                        firstItem={{
+                          content: <Icon name="angle double left" />,
+                          icon: true
+                        }}
+                        lastItem={{
+                          content: <Icon name="angle double right" />,
+                          icon: true
+                        }}
+                        prevItem={{
+                          content: <Icon name="angle left" />,
+                          icon: true
+                        }}
+                        nextItem={{
+                          content: <Icon name="angle right" />,
+                          icon: true
+                        }}
+                        totalPages={this.state.pages}
+                      />
+                    </div>
                   ) : (
                     ""
                   )}
-                  {this.state.products.length !== 0 ? (
-                    <div className="gallary">
-                      {this.state.products.map((obj, index) => (
-                        <Card
-                          key={index}
-                          className="product"
-                          onClick={() => this.setState({ product: obj })}
-                        >
-                          <Image
-                            src={obj.image}
-                            style={{ height: "auto", width: "auto" }}
-                            wrapped
-                          />
-                          <Card.Content>
-                            <Card.Header>{obj.name}</Card.Header>
-                            <Card.Meta style={{ marginTop: 10 }}>
-                              <Icon name="tag" />
-                              {obj.brand}
-                            </Card.Meta>
-                          </Card.Content>
-                          <Card.Content extra>
-                            <span style={{ paddingTop: 5, paddingBottom: 5 }}>
-                              Category: {obj.category}
-                            </span>
-                          </Card.Content>
-                        </Card>
-                      ))}
-                    </div>
-                  ) : (
-                    <div style={{ textAlign: "center", marginTop: "5vh" }}>
-                      <Icon name="frown outline" size="massive" />
-                      <h2>No products found!!!</h2>
-                    </div>
-                  )}
-                </React.Fragment>
-              )}
-
-              {[0, 1].indexOf(this.state.pages) === -1 &&
-              !this.state.loading ? (
-                <div style={{ textAlign: "center" }}>
-                  <Pagination
-                    style={{ marginTop: "4vh" }}
-                    defaultActivePage={this.state.page}
-                    onPageChange={(e, data) => {
-                      this.setState({ page: data.activePage });
-                      this.getProducts(
-                        this.getUri() + "?page=" + data.activePage
-                      );
-                    }}
-                    ellipsisItem={{
-                      content: <Icon name="ellipsis horizontal" />,
-                      icon: true
-                    }}
-                    firstItem={{
-                      content: <Icon name="angle double left" />,
-                      icon: true
-                    }}
-                    lastItem={{
-                      content: <Icon name="angle double right" />,
-                      icon: true
-                    }}
-                    prevItem={{
-                      content: <Icon name="angle left" />,
-                      icon: true
-                    }}
-                    nextItem={{
-                      content: <Icon name="angle right" />,
-                      icon: true
-                    }}
-                    totalPages={this.state.pages}
-                  />
-                </div>
-              ) : (
-                ""
-              )}
-            </Grid.Column>
-            <Grid.Column width={1}></Grid.Column>
-          </Grid.Row>
-        </Grid>
+                </Grid.Column>
+                <Grid.Column width={1}></Grid.Column>
+              </Grid.Row>
+            </Grid>
+          </React.Fragment>
+        )}
       </React.Fragment>
     );
   };

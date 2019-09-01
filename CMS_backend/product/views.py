@@ -9,12 +9,17 @@ from .models import Brand, Product, Specification, Category, Relation
 
 
 class BrandListCreateAPIView(ListCreateAPIView):
-    
+    """
+    Summary: Create / List Brands
+    """
     serializer_class = BrandSerializer
     queryset = Brand.objects.all()
 
 
 class BrandRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
+    """
+    Summary: Update / Delete Brands
+    """
     serializer_class = BrandSerializer
     http_method_names = ['patch', 'delete']
 
@@ -30,6 +35,9 @@ class BrandRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
 
 
 class ProductListCreateView(ListCreateAPIView):
+    """
+    Summary: Create / List Products.
+    """
     serializer_class = ProductListCreateSerializer
     queryset = Product.objects.all()
 
@@ -65,6 +73,7 @@ class ProductListCreateView(ListCreateAPIView):
 
         context = super(ProductListCreateView, self).get(request, *args, **kwargs)
         if len(tree) != 0:
+            context.data['child'] = Relation.objects.filter(category__name=category).values_list('child__name', flat=True)
             context.data['categories'] = tree
         return context
 
@@ -112,6 +121,9 @@ class ProductListCreateView(ListCreateAPIView):
 
 
 class ProductRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
+    """
+    Summary: View / Update / Delete Products
+    """
     serializer_class = ProductSerializer
     http_method_names = ['get', 'patch', 'delete']
 
@@ -161,6 +173,9 @@ class ProductRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
 
 
 class CategoryListCreateAPIView(ListCreateAPIView):
+    """
+    Summary: Create / List Categories.
+    """
     serializer_class = CategorySerializer
 
     def get_queryset(self):
@@ -197,6 +212,9 @@ class CategoryListCreateAPIView(ListCreateAPIView):
 
 
 class CategoryRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
+    """
+    Summary: View / Update / Delete Categories
+    """
     serializer_class = CategorySerializer
     http_method_names = ['patch', 'delete']
 

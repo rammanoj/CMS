@@ -72,14 +72,17 @@ class AddItems extends React.Component {
       .then(resp => {
         if (resp.error !== undefined) {
           this.setState({ loading: false });
-          this.props.set({
-            message: {
-              type: 1,
-              trigger: true,
-              update: !this.props.message.update,
-              message: resp.message
-            }
-          });
+          this.props.set(
+            {
+              message: {
+                type: 1,
+                trigger: true,
+                update: !this.props.message.update,
+                message: resp.message
+              }
+            },
+            () => {}
+          );
         } else {
           let obj = {
             add: false,
@@ -92,7 +95,7 @@ class AddItems extends React.Component {
           };
           if (this.props.add == 0) {
             let products = [...this.props.product];
-            products.push(resp);
+            products.unshift(resp);
             obj.products = products;
           } else if (this.props.add == 1) {
             let brands = [...this.props.brand];
@@ -112,7 +115,7 @@ class AddItems extends React.Component {
             obj.categories = categories;
           }
           this.setState({ loading: false });
-          this.props.set(obj);
+          this.props.set(obj, () => {});
         }
       });
   };
@@ -167,7 +170,7 @@ class AddItems extends React.Component {
         size="tiny"
         closeIcon={true}
         onClose={(e, obj) => {
-          this.props.set({ add: false });
+          this.props.set({ add: false }, () => {});
         }}
         className="add_modal"
       >
