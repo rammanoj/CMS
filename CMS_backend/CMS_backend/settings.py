@@ -79,10 +79,15 @@ WSGI_APPLICATION = 'CMS_backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'cms',
+        'USER': 'guest',
+        'PASSWORD': 'guest',
+        'HOST': 'localhost',
+        'PORT': '',
     }
 }
+
 
 
 # Password validation
@@ -140,3 +145,8 @@ REST_FRAMEWORK = {
 }
 
 CORS_ORIGIN_ALLOW_ALL = True
+
+try:
+    from .local_settings_sample import *
+except KeyError:
+    pass

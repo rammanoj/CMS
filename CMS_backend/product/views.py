@@ -199,7 +199,10 @@ class CategoryListCreateAPIView(ListCreateAPIView):
     def post(self, request, *args, **kwargs):
         with transaction.atomic():
             # Create the Category
-            request.data['parent'] = get_object_or_404(Category, name=request.data['parent']).pk
+            try:
+                request.data['parent'] = get_object_or_404(Category, name=request.data['parent']).pk
+            except KeyError:
+                pass
             context = super(CategoryListCreateAPIView, self).post(request, *args, **kwargs)
             parent_exist = Category.objects.filter(name=context.data['parent'])
             if parent_exist.exists():
