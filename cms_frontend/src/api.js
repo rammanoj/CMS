@@ -1,4 +1,5 @@
-const BASE_URL = "http://127.0.0.1:8000/";
+// const BASE_URL = "http://127.0.0.1:8000/";
+const BASE_URL = "http://3.16.215.150/";
 
 export const productList = BASE_URL + "product/add/";
 

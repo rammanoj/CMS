@@ -292,6 +292,7 @@ class Product extends React.Component {
               type={this.state.message.type}
             />
             <Fab
+              event="click"
               icon={<Icon name="plus" style={{ marginLeft: 4 }} />}
               mainButtonStyles={{ background: "#36c" }}
               alwaysShowTitle={false}
@@ -344,44 +345,42 @@ class Product extends React.Component {
                     <React.Fragment>
                       <div>
                         <Grid>
-                          <Grid.Row>
-                            <Grid.Column width={4}>
-                              <Card>
-                                <Card.Content>
-                                  <Placeholder>
-                                    <Placeholder.Image square />
-                                  </Placeholder>
-                                </Card.Content>
-                              </Card>
-                            </Grid.Column>
-                            <Grid.Column width={4}>
-                              <Card>
-                                <Card.Content>
-                                  <Placeholder>
-                                    <Placeholder.Image square />
-                                  </Placeholder>
-                                </Card.Content>
-                              </Card>
-                            </Grid.Column>
-                            <Grid.Column width={4}>
-                              <Card>
-                                <Card.Content>
-                                  <Placeholder>
-                                    <Placeholder.Image square />
-                                  </Placeholder>
-                                </Card.Content>
-                              </Card>
-                            </Grid.Column>
-                            <Grid.Column width={4}>
-                              <Card>
-                                <Card.Content>
-                                  <Placeholder>
-                                    <Placeholder.Image square />
-                                  </Placeholder>
-                                </Card.Content>
-                              </Card>
-                            </Grid.Column>
-                          </Grid.Row>
+                          <Grid.Column computer={4} tablet={8} mobile={16}>
+                            <Card>
+                              <Card.Content>
+                                <Placeholder>
+                                  <Placeholder.Image square />
+                                </Placeholder>
+                              </Card.Content>
+                            </Card>
+                          </Grid.Column>
+                          <Grid.Column computer={4} tablet={8} mobile={16}>
+                            <Card>
+                              <Card.Content>
+                                <Placeholder>
+                                  <Placeholder.Image square />
+                                </Placeholder>
+                              </Card.Content>
+                            </Card>
+                          </Grid.Column>
+                          <Grid.Column computer={4} tablet={8} mobile={16}>
+                            <Card>
+                              <Card.Content>
+                                <Placeholder>
+                                  <Placeholder.Image square />
+                                </Placeholder>
+                              </Card.Content>
+                            </Card>
+                          </Grid.Column>
+                          <Grid.Column computer={4} tablet={8} mobile={16}>
+                            <Card>
+                              <Card.Content>
+                                <Placeholder>
+                                  <Placeholder.Image square />
+                                </Placeholder>
+                              </Card.Content>
+                            </Card>
+                          </Grid.Column>
                         </Grid>
                       </div>
                     </React.Fragment>

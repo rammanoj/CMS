@@ -112,22 +112,28 @@ class ProductDetailView extends React.Component {
                           <b>Category:</b> {p.category}
                         </p>
                         <h4>Specs</h4>
-                        {p.spec.map((obj, index) => (
-                          <Label
-                            as="a"
-                            color="teal"
-                            key={index}
-                            icon
-                            style={{ marginTop: 2 }}
-                          >
-                            <Icon
-                              name="clipboard list"
-                              style={{ marginRight: 5 }}
-                            />
-                            <b>{obj.key}</b>
-                            <Label.Detail>{obj.value}</Label.Detail>
-                          </Label>
-                        ))}
+                        {p.spec.length > 0 ? (
+                          <React.Fragment>
+                            {p.spec.map((obj, index) => (
+                              <Label
+                                as="a"
+                                color="teal"
+                                key={index}
+                                icon
+                                style={{ marginTop: 2 }}
+                              >
+                                <Icon
+                                  name="clipboard list"
+                                  style={{ marginRight: 5 }}
+                                />
+                                <b>{obj.key}</b>
+                                <Label.Detail>{obj.value}</Label.Detail>
+                              </Label>
+                            ))}
+                          </React.Fragment>
+                        ) : (
+                          "None"
+                        )}
                       </Message>
                     </Grid.Column>
                   </React.Fragment>
