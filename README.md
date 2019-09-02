@@ -26,7 +26,7 @@ The above message is only displayed once (i.e when you open the website for the 
 
 **Note:** The above image is a full page screen-shot.
 
-You can add **Brands**, **Products** and **Categories** using the **+** icon at the bottom right corner. On hovering icon, the following options will be displayed:
+You can add **Brands**, **Products** and **Categories** using the **+** icon at the bottom right corner. On clicking icon, the following options will be displayed:
 
 ![](img/i2.png)
 
